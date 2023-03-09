@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>管理员登录</title>
+    <link rel="shortcut icon" href="../../static/images/ico/favicon.ico" />
+    <script src="http://cdn.staticfile.org/jquery/2.0.0/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="http://apps.bdimg.com/libs/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.2.0/css/bootstrap.min.css">
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #cdc9a5;
+        }
+
+        #btn_qrcode {
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        #div_qr_img {
+            height: 100%;
+            width: 100%;
+            position: fixed;
+            z-index: 100;
+            display: none;
+            background: rgba(75, 131, 131, 0.5);
+        }
+
+        #div_input_qr {
+            height: 100%;
+            width: 100%;
+            position: fixed;
+            z-index: 90;
+            display: none;
+            background: rgba(75, 131, 131, 0.5);
+        }
+
+        .input_qr_container {
+            position: fixed;
+            width: 500px;
+            height: 265px;
+            background-color: #f4f4f4;
+            margin: auto;
+            top: 50%;
+            left: 0;
+            right: 0;
+            bottom: 50%;
+            /* padding: 30px; */
+            border-radius: 15px;
+        }
+
+        .input_qr_info {
+            padding: 60px 50px;
+            color: gray;
+        }
+
+        .right-title-btn {
+            position: relative;
+            float: right;
+            margin: 20px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .right-title-btn:before {
+            position: absolute;
+            content: "";
+            width: 2px;
+            height: 25px;
+            background: #cccccc;
+            transform: rotate(45deg);
+            top: -3px;
+            left: 11px;
+        }
+
+        .right-title-btn:after {
+            position: absolute;
+            content: "";
+            width: 2px;
+            height: 25px;
+            background: #cccccc;
+            transform: rotate(-45deg);
+            top: -3px;
+            left: 11px;
+        }
+
+        #img {
+            width: 240px;
+            height: 240px;
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-left: -120px;
+            margin-top: -120px;
+        }
+
+        #auth_code {
+            display: none;
+        }
+
+        #google_code {
+            width: 300px;
+            height: 20px;
+            margin: 30px 0;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        #confirm_google {
+            width: 150px;
+            height: 30px;
+            background: #4e8262;
+            color: #dbdbdb;
+            font-size: 16px;
+            outline: none;
+            border: none;
+            border-radius: 5px;
+            height: 35px;
+        }
+
+        #confirm_google:hover {
+            color: white;
+            background-color: #49a06a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .box {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            align-items: center;
+            justify-content: center;
+            /* background: url("../../static/assets/img/login_bg.jpg"); */
+            background-size: cover;
+        }
+
+        .loginText {
+            margin-bottom: 15px;
+            color: #555555;
+        }
+
+        .loginText:hover {
+            color: #333333;
+        }
+
+        .login-form {
+            display: flex;
+            position: relative;
+            width: 450px;
+            height: 300px;
+            flex-direction: column;
+            padding: 40px;
+            text-align: center;
+            z-index: 1;
+            background: inherit;
+            border-radius: 18px;
+            overflow: hidden;
+        }
+
+        .login-form::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: calc(100% + 20px);
+            /* + 两边各有一个空格  否则 无效*/
+            height: calc(100% + 20px);
+            background: inherit;
+            box-shadow: 0 0 0 200px rgba(255, 255, 255, .2) inset;
+            z-index: -1;
+            filter: blur(6px);
+            overflow: hidden;
+        }
+
+        .login-form h2 {
+            font-size: 18px;
+            font-weight: 400;
+            color: #3d5245;
+        }
+
+        .login-form input,
+        .login-form button {
+            margin: 6px 0;
+            height: 36px;
+            background-color: rgba(255, 255, 255, .3);
+            border: none;
+            border-radius: 4px;
+            padding: 15px;
+            color: #3d5245;
+        }
+
+        .login-form input:focus {
+            background-color: rgba(255, 255, 255, .3);
+            outline: none;
+            box-shadow: 0 0 0 1px rgb(12, 88, 38);
+        }
+
+        .login-form input::placeholder {
+            color: #3d5245;
+        }
+
+        .login-form button {
+            position: relative;
+            margin-top: 24px;
+            background-color: rgba(57, 88, 69, .4);
+            color: #ffffff;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.4s;
+        }
+
+        .login-form button:hover {
+            background-color: rgba(12, 88, 38, 0.67);
+        }
+
+        .login-form button::before,
+        .login-form button::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 100%;
+            background-color: rgba(179, 255, 210, .5);
+            opacity: 0.5s;
+            position: absolute;
+            left: 0;
+            top: 0;
+            transform: skewX(-15deg);
+            filter: blur(30px);
+            overflow: hidden;
+            transform: translateX(-100px);
+        }
+
+        .login-form button::after {
+            width: 40px;
+            background-color: rgba(179, 255, 210, .3);
+            left: 60px;
+            filter: blur(5px);
+            opacity: 0;
+        }
+
+        .login-form button:hover::before {
+            transition: all 1s;
+            transform: translateX(320px);
+            opacity: 0.7;
+        }
+
+        .login-form button:hover::after {
+            transition: all 1s;
+            transform: translateX(320px);
+            opacity: 1;
+        }
+
+        #btnLogin {
+            padding: 0;
+        }
+
+        .shake {
+            animation: shake 800ms ease-in-out;
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translate3d(-1px, 0, 0);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(+2px, 0, 0);
+            }
+
+            30%,
+            70% {
+                transform: translate3d(-4px, 0, 0);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(+4px, 0, 0);
+            }
+
+            50% {
+                transform: translate3d(-4px, 0, 0);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-primary">
+    <div id="div_qr_img">
+        <img id="img" src="" alt="">
+    </div>
+    <div id="div_input_qr">
+        <div class="input_qr_container">
+            <span class="right-title-btn" onclick="handleClose()"></span>
+            <div class="input_qr_info">
+                <div>请输入谷歌验证码</div>
+                <input type="text" name="auth_code" id="google_code" placeholder="验证码" data-plsholder="GOOGLE_CODE">
+                <br>
+                <button id="confirm_google">
+                    确定
+                </button>
+            </div>
+
+        </div>
+    </div>
+    <div class="box">
+        <form action="#" class="login-form">
+            <div class="loginText">管理员登录</div>
+            <input type="text" name="username" id="username" placeholder="用户名" data-plsholder="USERNAME">
+            <input type="password" name="password" id="password" placeholder="密码" data-plsholder="PASSWORD">
+            <input type="text" name="auth_code" id="auth_code" placeholder="验证码" data-plsholder="GOOGLE_CODE">
+            <button type="submit" id="btnLogin" onclick="return false">登录</button>
+        </form>
+    </div>
+
+    <script>
+        toastr.options = {
+            "positionClass": "toast-top-center",
+        }
+    </script>
+    <script>
+        $("#btnLogin").click(login)
+
+        function login() {
+            var username = $("#username").val().trim()
+            var password = $("#password").val().trim()
+            var auth_code = $("#google_code").val().trim()
+            if (username == "") {
+                toastr["error"]("请输入用户名", "提示");
+                return false
+            } else if (password == "") {
+                toastr["error"]("请输入密码", "提示");
+                return false
+            }
+            $.ajax({
+                url: "/login/",
+                method: "POST",
+                data: {
+                    "username": username,
+                    "password": password,
+                    "auth_code": auth_code
+                },
+                success: showResult,
+                error: function (e) {
+                    showResult
+                    toastr["error"]("请求登录出错", "错误")
+                }
+            })
+        }
+
+        function showResult(response) {
+            if (response["code"] == 0) {
+                toastr["error"](response["error"], "错误")
+            } else if (response["code"] == 1) {
+                toastr["success"]("登录成功即将跳转...", "成功")
+                window.location.href = "/administrator/";
+            } else if (response["code"] == 2) {
+                $("#div_input_qr").show()
+                toastr["warning"](response["error"], "提示");
+                shake("google_code")
+            } else if (response["code"] == 3) {
+                $("#img").prop({
+                    "src": "data:image/png;base64," + response["base64"]
+                })
+                $("#div_qr_img").show()
+                $("#div_input_qr").show()
+            }
+        }
+
+    </script>
+
+    <script>
+        $("#div_qr_img").click(function () {
+            $("#div_qr_img").hide()
+        })
+        function handleClose() {
+            $("#div_input_qr").hide()
+        }
+    </script>
+
+    <script>
+        function shake(elemId) {
+            let elem = document.getElementById(elemId)
+            if (elem) {
+                elem.classList.add('shake')
+                setTimeout(() => { elem.classList.remove('shake') }, 800)
+            }
+        }
+
+        $("#confirm_google").click(function () {
+            let code = $("#google_code").val().trim()
+            if (!code || code.length != 6) {
+                shake("google_code")
+                return false
+            }
+            login()
+        })
+    </script>
+
+    <script>
+        $(document).keydown(function () {
+            if (event.keyCode == 13) {
+                login()
+            }
+        });
+
+        $("#google_code").bind(
+            'input propertychange', function () {
+                let code = $("#google_code").val().trim()
+                if (code.length == 6) {
+                    login()
+                }
+            }
+        )
+    </script>
+
+    <script>
+        function getCookie(name) {
+            var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+            if (arr = document.cookie.match(reg))
+                return unescape(arr[2]);
+            else
+                return null;
+        }
+        console.log("cookie is_login:", getCookie("is_login"))
+        if (getCookie("is_login")) {
+            toastr["warning"]("已登录，即将跳转", "提示")
+            setTimeout(_ => {
+                window.location.href = "/administrator/";
+            }, 2000)
+        }
+    </script>
+
+
+</body>
+
+</html>

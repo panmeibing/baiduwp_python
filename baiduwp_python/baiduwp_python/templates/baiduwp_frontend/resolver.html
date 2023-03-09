@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>百度网盘解析</title>
+</head>
+<style>
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #cdc9a5;
+    }
+
+    .formContainer {
+        width: 800px;
+        /* height: 420px; */
+        margin-bottom: 20px;
+        padding-bottom: 50px;
+        border: 3px solid #a75318;
+        border-radius: 10px;
+        margin: 100px auto;
+        background-color: #EE7621;
+    }
+
+    .formContainer form {
+        margin-top: 50px;
+    }
+
+    #containerTitle {
+        height: 80px;
+        text-align: center;
+    }
+
+    #containerTitle span {
+        font-size: 30px;
+        color: #ffffff;
+        line-height: 80px;
+    }
+
+    .inputForm {
+        height: 50px;
+        width: 500px;
+        margin: 20px auto;
+        border: solid #a75318 3px;
+        border-radius: 10px;
+        background-color: #f2a36b;
+        padding: 0 10px;
+    }
+
+    .inputForm input {
+        width: 100%;
+        height: 100%;
+        font-size: 20px;
+        background-color: transparent;
+        border: none;
+        text-decoration: none;
+        outline: none;
+    }
+
+    input::input-placeholder {
+        color: #a64f12;
+    }
+
+    input::-webkit-input-placeholder {
+        color: #a64f12;
+    }
+
+    input::-moz-placeholder {
+        color: #a64f12;
+    }
+
+    input::-moz-placeholder {
+        color: #a64f12;
+    }
+
+    input::-ms-input-placeholder {
+        color: #a64f12;
+    }
+
+
+    .buttonForm {
+        height: 50px;
+        width: 500px;
+        margin: 20px auto;
+        font-size: 20px;
+        border: solid #a75318 3px;
+        border-radius: 10px;
+        background-color: #ffb179;
+        padding: 0 10px;
+    }
+
+    .buttonForm button {
+        width: 100%;
+        height: 100%;
+        margin: 0 auto;
+        font-size: 20px;
+        outline: none;
+        text-decoration: none;
+        border: none;
+        background-color: transparent;
+        color: #903c00;
+        font-weight: bold;
+    }
+
+    .buttonForm:hover {
+        background-color: #ffc499;
+    }
+
+    #explorerContainer {
+        width: 800px;
+        margin: 0 auto;
+        display: none;
+    }
+
+    .fileIco {
+        width: 32px;
+        height: 32px;
+    }
+
+    .fileRow {
+        width: 550px;
+        /* height: 50px; */
+        border-bottom: 1px solid #a75318;
+        line-height: 50px;
+        align-items: center;
+        /* display: flex; */
+        padding: 0 20px;
+        margin-left: 110px;
+    }
+
+    .fileRow span {
+        height: 32px;
+        line-height: 32px;
+    }
+
+    .fileRow span {
+        margin: 0 10px;
+    }
+
+    .fileRow span a {
+        color: #582a0a;
+    }
+
+    .realLinkDiv button {
+        line-height: 30px;
+        outline: none;
+        padding: 0 20px;
+        margin: 0;
+        border: solid #a75318 3px;
+        background-color: #ffb179;
+        border-radius: 5px;
+    }
+
+    .realLinkDiv input {
+        height: 30px;
+        line-height: 30px;
+        width: 380px;
+        border: solid #a75318 3px;
+        border-radius: 5px;
+        background-color: #f2a36b;
+        padding: 0 10px;
+        outline: none;
+        text-decoration: none;
+    }
+
+    .footerDiv {
+        position: fixed;
+        bottom: 10px;
+        z-index: 100;
+        font-size: 15px;
+        left: 50%;
+        margin-left: -60px;
+    }
+</style>
+<link rel="shortcut icon" href="../../static/images/ico/favicon.ico" />
+<script src="http://cdn.staticfile.org/jquery/2.0.0/jquery.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script src="http://apps.bdimg.com/libs/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script src="https://clipboardjs.com/dist/clipboard.min.js"></script>
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.2.0/css/bootstrap.min.css">
+
+<body style="background-color: #cdc9a5;">
+
+    <div class="formContainer">
+        <div id="containerTitle">
+            <span>百度网盘在线解析</span>
+        </div>
+        <div style="background-color: #a75318; height: 5px; width: 100%;"></div>
+        <form action="">
+            <div class="inputForm">
+                <input type="text" placeholder="请输入网盘链接" id="input_share_url">
+            </div>
+            <div class="inputForm">
+                <input type="text" placeholder="请输入提取码" id="input_pwd">
+            </div>
+            <div class="inputForm" id="invitationCodeDiv" hidden>
+                <input type="text" placeholder="请输入邀请码" id="inputInvitationCode">
+            </div>
+            <div class="buttonForm">
+                <button onclick="return false">提交</button>
+            </div>
+        </form>
+
+        <div id="explorerContainer">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="fileRow">
+                                <span><a href="" id="upperLevel">上一级...</a></span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="fileRow">
+                                <img src="../../static/images/ico/folder.png" alt="" class="fileIco">
+                                <span><a href="">新建文件夹</a></span>
+                                <div>
+                                    <div class="realLinkDiv">
+                                        <span>链接</span>
+                                        <input type="text" readonly>
+                                        <button class="copyButton">复制</button>
+                                    </div>
+                                    <div class="realLinkDiv">
+                                        <span>代理</span>
+                                        <input type="text" readonly>
+                                        <button class="copyButton">复制</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="fileRow">
+                                <img src="../../static/images/ico/folder.png" alt="" class="fileIco">
+                                <span><a href="javascript:void(0);">新建文件夹</a></span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="fileRow">
+                                <img src="../../static/images/ico/folder.png" alt="" class="fileIco">
+                                <span><a href="">新建文件夹</a></span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="footerDiv">made by <a href="https://binglengdexiwang.top">冰冷的希望</a></div>
+</body>
+<script>
+    let upperLevelPath = ""
+    let share_uk = ""
+    let shareid = ""
+    let bdstoken = ""
+    let mSetUrl = "/mSetInfo/"
+    let fileListUrl = "/fileList/"
+    let downloadLinkUrl = "/downloadLink/"
+</script>
+
+<script>
+    toastr.options.positionClass = 'toast-top-center';
+    $("#input_share_url").change(function () {
+        let input_share_url = $("#input_share_url").val().trim()
+        console.log("change:", input_share_url)
+        if (!input_share_url) {
+            $("#input_share_url").val("")
+            $("#input_pwd").val("")
+            return false
+        }
+        let matchRes = input_share_url.match(/http[0-9a-zA-Z?=_\-:/.]+/)
+        console.log("matchRes:", matchRes)
+        if (!matchRes || !matchRes[0]) {
+            toastr["waring"]("自动识别链接失败", "提示")
+            return
+        }
+        share_url = matchRes[0]
+        $("#input_share_url").val(share_url)
+
+        let pwd = ""
+        pwd = share_url.split("?").length > 1 ? share_url.split("?")[1] : ""
+        pwd = pwd.split("=")[1]
+        if (!pwd) {
+            let mRes = input_share_url.match(/提取码: ?([0-9a-zA-Z]+)/)
+            if (mRes) {
+                pwd = mRes[1]
+            }
+        }
+        $("#input_pwd").val(pwd)
+    })
+
+    $(".buttonForm").click(function () {
+        let input_share_url = $("#input_share_url").val().trim()
+        let pwd = $("#input_pwd").val().trim()
+        if (!input_share_url) {
+            toastr["warning"]("请输入网盘链接", "提示")
+            return false
+        }
+        if ($("#invitationCodeDiv").is(":visible") && !$("#inputInvitationCode").val().trim()) {
+            toastr["warning"]("请输入邀请码", "提示")
+            return
+        }
+        getMSet()
+    })
+
+
+</script>
+
+<script>
+    let files = [
+        // {
+        //     "category": 6,
+        //     "fs_id": 934435682367559,
+        //     "isdir": 1,
+        //     "local_ctime": 1621308615,
+        //     "local_mtime": 1621308615,
+        //     "path": "/sharelink0-480654963977751/3dsmax/3dmax2022",
+        //     "parent_path": "/sharelink3073240792-480654963977751/3dsmax",
+        //     "server_ctime": 1621308615,
+        //     "server_filename": "3dmax2022",
+        //     "server_mtime": 1644238064,
+        //     "size": 0
+        // },
+        // {
+        //     "category": 5,
+        //     "fs_id": 830937815955136,
+        //     "isdir": 0,
+        //     "local_ctime": 1521869699,
+        //     "local_mtime": 1521869699,
+        //     "md5": "a79f60762a81dba8fd806233e9941900",
+        //     "path": "/sharelink3073240792-480654963977751/3dsmax/Autodesk_3ds_Max_2019_EFGJKPS_Win_64bit_003_003.sfx.exe",
+        //     "parent_path": "/sharelink3073240792-480654963977751/3dsmax",
+        //     "server_ctime": 1521869699,
+        //     "server_filename": "Autodesk_3ds_Max_2019_EFGJKPS_Win_64bit_003_003.sfx.exe",
+        //     "server_mtime": 1561784982,
+        //     "size": 450021000
+        // },
+        // {
+        //     "category": 5,
+        //     "fs_id": 92781334838182,
+        //     "isdir": 0,
+        //     "local_ctime": 1521869691,
+        //     "local_mtime": 1521869691,
+        //     "md5": "4de7ffe1ca87511b599aa60a0bce4a24",
+        //     "path": "/sharelink3073240792-480654963977751/3dsmax/Autodesk_3ds_Max_2019_EFGJKPS_Win_64bit_002_003.sfx.exe",
+        //     "parent_path": "/sharelink3073240792-480654963977751/3dsmax",
+        //     "server_ctime": 1521869691,
+        //     "server_filename": "Autodesk_3ds_Max_2019_EFGJKPS_Win_64bit_002_003.sfx.exe",
+        //     "server_mtime": 1561784982,
+        //     "size": 2115408424
+        // },
+        // {
+        //     "category": 5,
+        //     "fs_id": 517879331580918,
+        //     "isdir": 0,
+        //     "local_ctime": 1521869688,
+        //     "local_mtime": 1521869688,
+        //     "md5": "2a5f6be1bbc6d24fc172e887ed424604",
+        //     "path": "/sharelink3073240792-480654963977751/3dsmax/Autodesk_3ds_Max_2019_EFGJKPS_Win_64bit_001_003.sfx.exe",
+        //     "parent_path": "/sharelink3073240792-480654963977751/3dsmax",
+        //     "server_ctime": 1521869688,
+        //     "server_filename": "Autodesk_3ds_Max_2019_EFGJKPS_Win_64bit_001_003.sfx.exe",
+        //     "server_mtime": 1561784982,
+        //     "size": 2115408424
+        // },
+        // {
+        //     "category": 6,
+        //     "fs_id": 381680330545337,
+        //     "isdir": 0,
+        //     "local_ctime": 1561785049,
+        //     "local_mtime": 1561785036,
+        //     "md5": "9afb7d34ac26ead6b7435421c7bd5014",
+        //     "path": "/sharelink3073240792-480654963977751/3dsmax/3dsmax2019zhuceji.zip",
+        //     "parent_path": "/sharelink3073240792-480654963977751/3dsmax", // 自己加
+        //     "server_ctime": 1561785049,
+        //     "server_filename": "3dsmax2019zhuceji.zip",
+        //     "server_mtime": 1561785049,
+        //     "size": 2044074
+        // },
+        // {
+        //     "category": 6,
+        //     "fs_id": 934435682367559,
+        //     "isdir": 1,
+        //     "local_ctime": 1621308615,
+        //     "local_mtime": 1621308615,
+        //     "path": "/sharelink0-480654963977751/3dsmax/test",
+        //     "parent_path": "/sharelink0-480654963977751/3dsmax/3dmax2022",
+        //     "server_ctime": 1621308615,
+        //     "server_filename": "test",
+        //     "server_mtime": 1644238064,
+        //     "size": 0
+        // },
+        // {
+        //     "category": 6,
+        //     "fs_id": 934435682367559,
+        //     "isdir": 1,
+        //     "local_ctime": 1621308615,
+        //     "local_mtime": 1621308615,
+        //     "path": "/sharelink0-480654963977751/3dsmax/3dmax2023",
+        //     "parent_path": "/sharelink3073240792-480654963977751/3dsmax",
+        //     "server_ctime": 1621308615,
+        //     "server_filename": "3dmax2023",
+        //     "server_mtime": 1644238064,
+        //     "size": 0
+        // },
+        // {
+        //     "category": 6,
+        //     "fs_id": 934435682367559,
+        //     "isdir": 0,
+        //     "local_ctime": 1621308615,
+        //     "local_mtime": 1621308615,
+        //     "path": "/sharelink0-480654963977751/3dsmax/3dmax2023/test",
+        //     "parent_path": "/sharelink0-480654963977751/3dsmax/3dmax2023",
+        //     "server_ctime": 1621308615,
+        //     "server_filename": "3dmax2023test",
+        //     "server_mtime": 1644238064,
+        //     "size": 0
+        // },
+
+    ]
+    function getMSet() {
+        $.ajax({
+            "url": mSetUrl,
+            "method": "POST",
+            "data": {
+                "share_url": $("#input_share_url").val().trim(),
+                "pwd": $("#input_pwd").val().trim(),
+            },
+            beforeSend: showModal(),
+            success: function (res) {
+                hideModal()
+                console.log("getMset res:", res)
+                if (res.code != 1) {
+                    toastr["error"](res.error, "错误")
+                    if (res.code == 2) operateCookie(deleteCookie = true);
+                    return
+                }
+                let result = res.result
+                share_uk = result["share_uk"]
+                shareid = result["shareid"]
+                bdstoken = result["bdstoken"]
+                if (!share_uk || !shareid) {
+                    console.log(`share_uk:${share_uk}, shareid:${shareid}, bdstoken:${bdstoken}`)
+                    toastr["error"]("响应值缺少参数(请检查网盘链接是否从冰裤袋小程序获取)", "错误")
+                    return
+                }
+                if (result["file_list"] && Array.isArray(result["file_list"]) && result["file_list"].length > 0) {
+                    for (var i = 0, len = result["file_list"].length; i < len; i++) {
+                        if (result["file_list"][i]["parent_path"]) {
+                            result["file_list"][i]["parent_path"] = decodeURIComponent(result["file_list"][i]["parent_path"])
+                        }
+                        // result["file_list"][i]["parent_path"] = ""
+                        if (result["file_list"][i]["path"]) {
+                            result["file_list"][i]["path"] = decodeURIComponent(result["file_list"][i]["path"])
+                        }
+                        files.push(result["file_list"][i])
+                    }
+                }
+                console.log("getMSet() files:", files)
+                if (files.length > 0) {
+                    showFiles(files, files[0]["parent_path"])
+                }
+                $("#explorerContainer").show()
+            },
+            error: function (e) {
+                hideModal()
+                console.log(e)
+                toastr["error"]("请求失败", "错误")
+            },
+            // complete: hideModal(),
+        })
+    }
+
+    function getFileList(dir) {
+        $.ajax({
+            "url": fileListUrl,
+            "method": "POST",
+            "data": {
+                "share_uk": share_uk,
+                "shareid": shareid,
+                "bdstoken": bdstoken,
+                "dir": dir,
+            },
+            beforeSend: showModal(),
+            success: function (res) {
+                console.log("getFileList res:", res)
+                if (res.code != 1) {
+                    toastr["error"](res.error, "错误")
+                    if (res.code == 2) operateCookie(deleteCookie = true);
+                    return
+                }
+                for (var i = 0, len = res["result"].length; i < len; i++) {
+                    if (res["result"][i]["path"]) {
+                        res["result"][i]["path"] = decodeURIComponent(res["result"][i]["path"])
+                    }
+                    res["result"][i]["parent_path"] = dir
+                    files.push(res["result"][i])
+                }
+
+                console.log("getFileList() files: ", files)
+                showFiles(files, dir)
+            },
+            error: function (e) {
+                console.log(e)
+                toastr["error"]("请求失败", "错误")
+            },
+            complete: hideModal(),
+
+        })
+    }
+
+    function getDownloadLink(this_) {
+        $.ajax({
+            url: downloadLinkUrl,
+            method: "POST",
+            data: {
+                "share_url": $("#input_share_url").val().trim(),
+                "fs_id": this_.attr("fs_id"),
+                "share_uk": share_uk,
+                "shareid": shareid,
+            },
+            beforeSend: showModal(),
+            success: function (res) {
+                console.log("getDownloadLink res:", res)
+                if (res.code != 1) {
+                    toastr["error"](res.error, "错误")
+                    if (res.code == 2) operateCookie(deleteCookie = true);
+                    return
+                }
+                let rDiv = $("#rlink_div_" + this_.attr('fs_id'))
+                console.log("rDiv:", rDiv)
+                rDiv.append($('<div class="realLinkDiv"><span>链接</span><input type="text" realonly value="' + res.result["real_link"] + '"><button class="copyButton">复制</button></div>'))
+                rDiv.append($('<div class="realLinkDiv"><span>代理</span><input type="text" realonly value="' + res.result["user_agent"] + '"><button class="copyButton">复制</button></div>'))
+                this_.attr("isSuccess", 1)
+                monitorCopyClick()
+            },
+            error: function (e) {
+                console.log(e)
+                toastr["error"]("请求失败", "错误")
+            },
+            complete: hideModal(),
+        })
+    }
+
+    function monitorCopyClick() {
+        $('.copyButton').click(function () {
+            let realLink = $(this).parent().find("input").val().trim()
+            console.log("realLink:", realLink)
+            if (!realLink) {
+                toastr["warning"]("没有可复制的内容", "提示")
+                return false
+            }
+            var clipboard = new ClipboardJS('.copyButton', {
+                text: function () {
+                    return realLink;
+                }
+            });
+            clipboard.on('success', function (e) {
+                toastr["success"]("复制成功", "提示")
+                e.clearSelection();
+                if (clipboard) {
+                    clipboard.destroy();
+                }
+            });
+            clipboard.on('error', function (e) {
+                toastr["error"]("复制失败", "提示")
+                if (clipboard) {
+                    clipboard.destroy();
+                }
+            });
+        })
+    }
+
+    function monitorFileClick() {
+        $('.fileRow span a').click(function () {
+            let path = $(this).attr("path")
+            let id_ = $(this).attr("id")
+
+            if (id_ == "upperLevel") {
+                if (!upperLevelPath) {
+                    lastPath = $(".fileRow span a").last().attr("parent_path")
+                    console.log('lastPath:', lastPath)
+                    if (!lastPath) {
+                        toastr["warning"]("没有上一级了哦", "提示")
+                        return
+                    }
+                    for (var i = files.length - 1; i >= 0; i--) {
+                        if (files[i].path == lastPath && files[i].parent_path) {
+                            upperLevelPath = files[i].parent_path
+                            break
+                        }
+                    }
+                    if (!upperLevelPath) {
+                        toastr["warning"]("没有上一级了啦啦啦啦啦", "提示")
+                        return
+                    }
+                }
+                showFiles(files, upperLevelPath)
+                upperLevelPath = ""
+            } else {
+                if ($(this).attr('is_dir') == 1) {
+                    let isIn = isInTempList(files, path)
+                    if (!isIn) {
+                        console.log("发起请求")
+                        getFileList(path)
+                    }
+                    if ($(this).attr("parent_path")) {
+                        upperLevelPath = $(this).attr("parent_path")
+                    }
+                    showFiles(files, path)
+                } else {
+                    console.log("这不是文件夹")
+                    if ($(this).attr("isSuccess") == 1) {
+                        return
+                    }
+                    getDownloadLink($(this))
+                }
+            }
+        })
+    }
+
+    function showFiles(tempList, parent_path) {
+        console.log("showFiles:", tempList.length, parent_path)
+        let tbody = $('<tbody><tr><td> <div class="fileRow"><span><a href="javascript:void(0);" path="' + upperLevelPath + '" id="upperLevel">上一级...</a></span></div></td></tr></tbody>')
+        for (var i = 0, len = tempList.length; i < len; i++) {
+            if (tempList[i].parent_path == parent_path) {
+                let img = $('<img alt="" class="fileIco">')
+                if (tempList[i].isdir == 1) {
+                    img.attr("src", '../../static/images/ico/folder.png')
+                } else {
+                    img.attr("src", "../../static/images/ico/exe.png")
+                }
+                let span = $('<span><a href="javascript:void(0);" path="' + tempList[i].path + '" parent_path="' + tempList[i].parent_path + '" is_dir=' + tempList[i].isdir + ' fs_id=' + tempList[i].fs_id + ' >' + tempList[i].server_filename + '</a></span>')
+                let fileRowDiv = $('<div class="fileRow"></div>')
+                fileRowDiv.append(img)
+                fileRowDiv.append(span)
+                if (tempList[i].isdir == 0) {
+                    fileRowDiv.append($('<div id="rlink_div_' + tempList[i].fs_id + '"></div>'))
+                    // fileRowDiv.append($('<div class="realLinkDiv" id="rl_div_' + tempList[i].fs_id + '"><span>链接</span><input type="text" id="r_l_' + tempList[i].fs_id + '"><button>复制</button></div>'))
+                    // fileRowDiv.append($('<div class="realLinkDiv"><span>代理</span><input type="text"><button>复制</button></div>'))
+                }
+                tbody.append($('<tr><td>' + fileRowDiv[0].outerHTML + '</td></tr>'))
+            }
+        }
+        $('tbody').empty()
+        $('tbody').append(tbody)
+
+        monitorFileClick()
+
+    }
+    function isInTempList(tempList, path) {
+        console.log("isInTempList()", tempList.length, path)
+        for (var i = 0, len = tempList.length; i < len; i++) {
+            if (tempList[i].parent_path == path) {
+                return true
+            }
+        }
+        return false
+    }
+    showFiles(files, "/sharelink3073240792-480654963977751/3dsmax")
+</script>
+
+<script>
+    function operateCookie(deleteCookie = false) {
+        var exdate = new Date()
+        exdate.setTime(exdate.getTime() + 24 * 60 * 60 * 1000 * -1)
+        console.log("exdate:", exdate)
+        if (deleteCookie) {
+            console.log("delete cookie == true")
+            document.cookie = "invitation_code=1;path=/;expires=" + exdate.toGMTString()
+        }
+        let cookiesStr = document.cookie
+        let invitationCodeCookie = ""
+        let cookieArray = cookiesStr.split(";")
+        for (var i = 0, len = cookieArray.length; i < len; i++) {
+            let k_v = cookieArray[i].split("=")
+            if (k_v[0].trim() == "invitation_code") {
+                invitationCodeCookie = k_v[1].trim()
+            }
+        }
+        if (invitationCodeCookie) {
+            $("#invitationCodeDiv").hide()
+        } else {
+            $("#invitationCodeDiv").show()
+        }
+        $("#inputInvitationCode").change(function () {
+            let invitation_code = $("#inputInvitationCode").val().trim()
+            if (invitation_code) {
+                console.log("设置cookie:", "invitation_code=" + invitation_code)
+                document.cookie = "invitation_code=" + invitation_code + ";path=/"
+            } else {
+                console.log("删除cookie:", "invitation_code=" + invitation_code + ";path=/;expires=" + exdate.toGMTString())
+                document.cookie = "invitation_code=" + invitation_code + ";path=/;expires=" + exdate.toGMTString()
+            }
+        })
+    }
+    $(function () {
+        operateCookie()
+    })
+
+</script>
+
+<div class="modal fade" id="loading">
+    <div class="modal-dialog modal-sm">
+        <img src="../../static/images/ico/loading.gif" width="350" height="350">
+    </div>
+</div>
+
+<script>
+    function showModal() {
+        $('#loading').modal('show');
+    }
+
+    function hideModal() {
+        setTimeout(function () {
+            $('#loading').modal('hide');
+            $('.modal-backdrop').remove();
+        }, 500);
+    }
+    hideModal()
+    // showModal()
+</script>
+
+</html>

@@ -1,0 +1,26 @@
+<!-- 加载时的圈圈
+<link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.2.0/css/bootstrap.min.css">
+<script src="http://apps.bdimg.com/libs/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+-->
+
+<div class="modal fade" id="loading">
+    <div class="modal-dialog modal-sm">
+        <img src="../../static/images/ico/loading.gif" style="margin: 0 100px;">
+    </div>
+</div>
+
+
+<script>
+    function showModal() {
+        $('#loading').modal('show');
+    }
+
+    function hideModal() {
+        setTimeout(function () {
+            $('#loading').modal('hide');
+            $('.modal-backdrop').remove(); //去掉遮罩层
+        }, 500);
+    }
+    // hideModal()
+    // showModal()
+</script>
