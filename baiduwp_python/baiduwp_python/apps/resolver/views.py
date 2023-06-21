@@ -44,26 +44,29 @@ class MSetInfo(View):
         try:
             res = requests.get(url, headers=headers)
             if res.status_code != 200:
-                res_data.update({"errmsg": f"获取mset响应码为{res.status_code}"})
-                return res_data
+                res_data.update({"error": f"获取mset响应码为{res.status_code}"})
+                return JsonResponse(res_data)
             html = res.text
         except Exception as e:
             logger(f"MSetInfo POST: request url {url} failed: {e}")
-            res_data.update({"errmsg": "请求mset失败"})
-            return res_data
+            res_data.update({"error": "请求mset失败"})
+            return JsonResponse(res_data)
 
         # html = get_html_by_selenium(url)
 
         match_res = re.findall('locals.mset\((?P<resJson>\{.*?\})\)', html)
         if not match_res:
-            res_data.update({"errmsg": "匹配文件信息失败（locals.mset）"})
-            return res_data
+            res_data.update({"error": "匹配文件信息失败（locals.mset）"})
+            return JsonResponse(res_data)
         try:
             files_info = json.loads(match_res[0])
         except Exception as e:
             logger.error(f"MSetInfo POST: json.loads error: {e}, match_res[0]: {match_res[0]}")
-            res_data.update({"errmsg": f"将匹配信息转换成JSON时出错"})
-            return res_data
+            res_data.update({"error": f"将匹配信息转换成JSON时出错"})
+            return JsonResponse(res_data)
+        if not files_info.get("file_list"):
+            res_data.update({"error": "获取文件列表失败（locals.mset）"})
+            return JsonResponse(res_data)
         res_data.update({"code": 1, "result": files_info})
         return JsonResponse(res_data)
 
