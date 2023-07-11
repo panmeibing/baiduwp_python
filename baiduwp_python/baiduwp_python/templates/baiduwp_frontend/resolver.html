@@ -260,10 +260,12 @@
     let upperLevelPath = ""
     let share_uk = ""
     let shareid = ""
+    let seckey = ""
     let bdstoken = ""
     let mSetUrl = "/mSetInfo/"
     let fileListUrl = "/fileList/"
     let downloadLinkUrl = "/downloadLink/"
+    let wxFileListUrl = "/wxFileList/"
 </script>
 
 <script>
@@ -308,7 +310,8 @@
             toastr["warning"]("请输入邀请码", "提示")
             return
         }
-        getMSet()
+        // getMSet()
+        getWxList()
     })
 
 
@@ -479,6 +482,62 @@
         })
     }
 
+    function getWxList(file_path = "") {
+        file_path = file_path ? file_path : ""
+        $.ajax({
+            "url": wxFileListUrl,
+            "method": "POST",
+            "data": {
+                "share_url": $("#input_share_url").val().trim(),
+                "pwd": $("#input_pwd").val().trim(),
+                "file_path": file_path,
+            },
+            beforeSend: showModal(),
+            success: function (res) {
+                hideModal()
+                console.log("getWxList res:", res)
+                if (res.code != 1) {
+                    toastr["error"](res.error, "错误")
+                    if (res.code == 2) operateCookie(deleteCookie = true);
+                    return
+                }
+                let result = res.result
+                share_uk = result["uk"]
+                shareid = result["shareid"]
+                seckey = result["seckey"]
+                if (!share_uk || !shareid) {
+                    console.log(`share_uk:${share_uk}, shareid:${shareid}, bdstoken:${bdstoken}`)
+                    toastr["error"]("响应值缺少参数(请检查网盘链接是否从冰裤袋小程序获取)", "错误")
+                    return
+                }
+                if (result["list"] && Array.isArray(result["list"]) && result["list"].length > 0) {
+                    for (var i = 0, len = result["list"].length; i < len; i++) {
+                        if (result["list"][i]["parent_path"]) {
+                            result["list"][i]["parent_path"] = decodeURIComponent(result["list"][i]["parent_path"])
+                        }
+                        // result["file_list"][i]["parent_path"] = ""
+                        if (result["list"][i]["path"]) {
+                            result["list"][i]["path"] = decodeURIComponent(result["list"][i]["path"])
+                        }
+                        result["list"][i]["parent_path"] = file_path
+                        files.push(result["list"][i])
+                    }
+                }
+                console.log("getWxList() files:", files)
+                if (files.length > 0) {
+                    showFiles(files, file_path)
+                }
+                $("#explorerContainer").show()
+            },
+            error: function (e) {
+                hideModal()
+                console.log(e)
+                toastr["error"]("请求失败", "错误")
+            },
+            // complete: hideModal(),
+        })
+    }
+
     function getFileList(dir) {
         $.ajax({
             "url": fileListUrl,
@@ -526,6 +585,7 @@
                 "fs_id": this_.attr("fs_id"),
                 "share_uk": share_uk,
                 "shareid": shareid,
+                "seckey": seckey,
             },
             beforeSend: showModal(),
             success: function (res) {
@@ -610,7 +670,8 @@
                     let isIn = isInTempList(files, path)
                     if (!isIn) {
                         console.log("发起请求")
-                        getFileList(path)
+                        // getFileList(path)
+                        getWxList(path)
                     }
                     if ($(this).attr("parent_path")) {
                         upperLevelPath = $(this).attr("parent_path")
