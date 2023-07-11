@@ -17,7 +17,7 @@ admin_path = "admin/"
 # 登录验证白名单
 login_path_white_list = [
     "/login/", "/resolver/", "/admin/",
-    "/mSetInfo/", "/fileList/", "/downloadLink/"
+    "/mSetInfo/", "/fileList/", "/downloadLink/", "/wxFileList/"
 ]
 # 登录验证黑名单
 login_path_black_list = []
