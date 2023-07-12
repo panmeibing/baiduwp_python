@@ -37,3 +37,12 @@ RESP_CODE_ERROR = 0
 RESP_CODE_SUCCESS = 1
 RESP_CODE_INVITATION = 2
 RESP_CODE_PARSE_LIMIT = 3
+
+"""wxList常见错误信息"""
+WX_LIST_ERROR_TYPE = {
+    "mispw_9": "提取码错误",
+    "mispwd-9": "提取码错误",
+    "mis_105": "所解析的链接不存在",
+    "mis_2": "文件目录不存在",
+    "mis_4": "文件目录不存在",
+}

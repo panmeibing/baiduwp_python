@@ -281,7 +281,7 @@
         let matchRes = input_share_url.match(/http[0-9a-zA-Z?=_\-:/.]+/)
         console.log("matchRes:", matchRes)
         if (!matchRes || !matchRes[0]) {
-            toastr["waring"]("自动识别链接失败", "提示")
+            toastr["warning"]("自动识别链接失败", "提示")
             return
         }
         share_url = matchRes[0]
@@ -304,6 +304,10 @@
         let pwd = $("#input_pwd").val().trim()
         if (!input_share_url) {
             toastr["warning"]("请输入网盘链接", "提示")
+            return false
+        }
+        if (pwd && pwd.length != 4) {
+            toastr["warning"]("验证码长度应为4", "提示")
             return false
         }
         if ($("#invitationCodeDiv").is(":visible") && !$("#inputInvitationCode").val().trim()) {

@@ -8,7 +8,7 @@ from django.shortcuts import render
 from django.views import View
 
 from baiduwp_python.apps.account.utils.cookie_orm import get_cookie_from_db
-from baiduwp_python.settings.config import RESP_CODE_ERROR, RESP_CODE_SUCCESS
+from baiduwp_python.settings.config import RESP_CODE_ERROR, RESP_CODE_SUCCESS, WX_LIST_ERROR_TYPE
 from baiduwp_python.settings.settings import logger
 from baiduwp_python.utils.header_utils import get_bd_headers
 
@@ -259,6 +259,9 @@ def get_wx_list(cookie, surl, pwd, path=""):
     except Exception as e:
         logger.error(f"WxFileList POST get_wx_list() request failed: {e}")
         return False, "请求文件列表错误"
+    if res.get("errtype") != 0:
+        logger.warning(f"WxFileList POST get_wx_list() is not ok, res.json: {res}")
+        return False, WX_LIST_ERROR_TYPE.get(res.get("errtype"), "遇到未知错误")
     if res["errno"] != 0:
         logger.warning(f"WxFileList POST get_wx_list() is not ok, res.json: {res}")
         return False, "请求文件列表失败"
