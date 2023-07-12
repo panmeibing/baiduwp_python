@@ -57,6 +57,7 @@ MIDDLEWARE = [
     'middlewares.login_middleware.LoginRequireMiddleware',
     'middlewares.throttle_middleware.InvitationMiddleware',
     'middlewares.throttle_middleware.StatisticsMiddleware',
+    'middlewares.throttle_middleware.ParseCountLimitMiddleware',
 ]
 
 ROOT_URLCONF = 'baiduwp_python.urls'
@@ -115,6 +116,14 @@ CACHES = {
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "CONNECTION_POOL_KWARGS": {"max_connections": 100, 'decode_responses': True},
+        }
+    },
+    "parse_count_limit": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "CONNECTION_POOL_KWARGS": {"max_connections": 1000, 'decode_responses': True},
         }
     },
 }

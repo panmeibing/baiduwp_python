@@ -2,7 +2,9 @@ from django.http import JsonResponse
 from django.utils.deprecation import MiddlewareMixin
 from django_redis import get_redis_connection
 
-from baiduwp_python.settings.config import throttle_path_list
+from baiduwp_python.middlewares.utils.request_path_utils import normalize_path
+from baiduwp_python.settings.config import THROTTLE_PATH_LIST, PARSE_COUNT_LIMIT, PARSE_COUNT_EX_TIME
+from baiduwp_python.utils.remote_ip_utils import get_client_ip
 
 
 class InvitationMiddleware(MiddlewareMixin):
@@ -11,9 +13,8 @@ class InvitationMiddleware(MiddlewareMixin):
         self.get_response = get_response
 
     def process_request(self, request):
-        path = str(request.path) if request.path else ""
-        path = path + "/" if path.startswith("/") and not path.endswith("/") else path
-        if path not in throttle_path_list:
+        path = normalize_path(request)
+        if path not in THROTTLE_PATH_LIST:
             return None
         redis_conn = get_redis_connection("default")
         inv_code_redis = redis_conn.get("bdwp:invitation_code")
@@ -22,7 +23,7 @@ class InvitationMiddleware(MiddlewareMixin):
         invitation_code = request.COOKIES.get("invitation_code")
         if not invitation_code:
             return JsonResponse({"code": 2, "error": "缺少邀请码"})
-        print(f"inv_code_redis:{inv_code_redis}, invitation_code:{invitation_code}")
+        # print(f"inv_code_redis:{inv_code_redis}, invitation_code:{invitation_code}")
         if str(invitation_code) != str(inv_code_redis):
             res = JsonResponse({"code": 2, "error": "邀请码错误"})
             res.delete_cookie("invitation_code")
@@ -35,8 +36,7 @@ class StatisticsMiddleware(MiddlewareMixin):
         self.get_response = get_response
 
     def process_request(self, request):
-        path = str(request.path) if request.path else ""
-        path = path + "/" if path.startswith("/") and not path.endswith("/") else path
+        path = normalize_path(request)
         redis_conn = get_redis_connection("default")
         redis_conn.incrby("bdwp:totalVisitCount", 1)
         count_key = ""
@@ -48,3 +48,28 @@ class StatisticsMiddleware(MiddlewareMixin):
             count_key = "bdwp:downloadLinkCount"
         if count_key:
             redis_conn.incrby(count_key, 1)
+
+
+class ParseCountLimitMiddleware(MiddlewareMixin):
+    def __init__(self, get_response=None):
+        super().__init__(get_response)
+        self.get_response = get_response
+
+    def process_request(self, request):
+        path = normalize_path(request)
+        if path != "/downloadLink/":
+            return None
+        client_ip = get_client_ip(request)
+        # print(f"ParseCountLimitMiddleware client_ip: {client_ip}")
+        if not client_ip:
+            return JsonResponse({"code": 3, "error": "获取远程IP失败"})
+        redis_conn = get_redis_connection("parse_count_limit")
+        used_count = redis_conn.get(client_ip)
+        if not used_count:
+            redis_conn.setex(client_ip, PARSE_COUNT_EX_TIME, "1")
+            return None
+        if int(used_count) >= PARSE_COUNT_LIMIT:
+            return JsonResponse({"code": 3, "error": "已到达最大解析次数，请等释放后再尝试"})
+        else:
+            redis_conn.incrby(client_ip, 1)
+            return None

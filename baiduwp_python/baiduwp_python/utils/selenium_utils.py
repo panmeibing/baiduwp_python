@@ -5,7 +5,7 @@ from selenium.webdriver.chrome.service import Service
 
 from baiduwp_python.settings.settings import logger
 # from .singleton_utils import singleton
-from baiduwp_python.settings.config import selenium_executable_path
+from baiduwp_python.settings.config import SELENIUM_EXECUTABLE_PATH
 
 
 def get_chrome_driver(executable_path):
@@ -31,7 +31,7 @@ def get_chrome_driver(executable_path):
 
 def get_html_by_selenium(url, bduss):
     try:
-        driver = get_chrome_driver(selenium_executable_path)
+        driver = get_chrome_driver(SELENIUM_EXECUTABLE_PATH)
         driver.get("https://www.baidu.com")
         driver.add_cookie({"name": "BDUSS", "value": bduss})
         driver.refresh()

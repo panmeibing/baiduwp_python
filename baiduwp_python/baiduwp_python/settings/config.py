@@ -1,29 +1,33 @@
 """定时同步任务"""
-is_run_sync_job = False  # 是否开启定时同步任务
+IS_RUN_SYNC_JOB = False  # 是否开启定时同步任务
 
 """邀请码验证"""
-is_need_invitation_code = True  # 是否需要邀请码
-invitation_code_fixed = None  # 邀请码，若为None则随机生成
-invitation_code_exp_time = 60 * 60 * 24  # 邀请码超时时间（秒）
+IS_NEED_INVITATION_CODE = True  # 是否需要邀请码
+INVITATION_CODE_FIXED = None  # 邀请码，若为None则随机生成
+INVITATION_CODE_EXP_TIME = 86400  # 邀请码超时时间（秒）
 # 需要验证邀请码的路径
-throttle_path_list = [
+THROTTLE_PATH_LIST = [
     "/mSetInfo/", "/fileList/", "/downloadLink/",
 ]
 
 """后台登录路由"""
-admin_path = "admin/"
+URL_PATH_ADMIN = "admin/"
 
 """登录控制"""
 # 登录验证白名单
-login_path_white_list = [
+LOGIN_PATH_WHITE_LIST = [
     "/login/", "/resolver/", "/admin/",
     "/mSetInfo/", "/fileList/", "/downloadLink/", "/wxFileList/"
 ]
 # 登录验证黑名单
-login_path_black_list = []
+LOGIN_PATH_BLACK_LIST = []
 # 登录验证IP地址黑名单
-login_ip_black_list = []
+LOGIN_IP_BLACK_LIST = []
 
 """chrome驱动"""
 # chrome驱动路径
-selenium_executable_path = r"E:\webdriver\chromedriver.exe"
+SELENIUM_EXECUTABLE_PATH = r"E:\webdriver\chromedriver.exe"
+
+"""限制解析次数"""
+PARSE_COUNT_LIMIT = 10  # 限制每个IP的解析次数
+PARSE_COUNT_EX_TIME = 86400  # 解除限制时间（秒）

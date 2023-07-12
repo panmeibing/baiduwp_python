@@ -16,10 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
-from baiduwp_python.settings.config import admin_path
+from baiduwp_python.settings.config import URL_PATH_ADMIN
 
 urlpatterns = [
-    path(admin_path, admin.site.urls),
+    path(URL_PATH_ADMIN, admin.site.urls),
     path('', include(("user.urls", "user"), namespace="user")),
     path('', include(("resolver.urls", "resolver"), namespace="resolver")),
     path('', include(("account.urls", "account"), namespace="account")),
