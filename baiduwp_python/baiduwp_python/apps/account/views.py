@@ -7,13 +7,14 @@ from django.http import JsonResponse
 from django.views import View
 
 from baiduwp_python.apps.account.utils.account_orm import add_account_cookie, del_account_cookie, get_account_cookie
+from baiduwp_python.settings.config import RESP_CODE_ERROR, RESP_CODE_SUCCESS
 from baiduwp_python.settings.settings import logger
 from baiduwp_python.utils.header_utils import get_bd_headers
 
 
 class BdAccount(View):
     def get(self, request):
-        res_data = {"code": 0, "error": "", "result": ""}
+        res_data = {"code": RESP_CODE_ERROR, "error": "", "result": ""}
         username = request.GET.get("username")
         vip_type = request.GET.get("vip_type")
         is_valid = request.GET.get("is_valid")
@@ -22,14 +23,14 @@ class BdAccount(View):
             return JsonResponse(res_data)
         is_ok, data = get_account_cookie(username, vip_type, is_valid)
         if is_ok:
-            res_data.update({"code": 1})
+            res_data.update({"code": RESP_CODE_SUCCESS})
             res_data.update({"data": data})
         else:
             res_data.update({"error": data})
         return JsonResponse(res_data)
 
     def post(self, request):
-        res_data = {"code": 0, "error": "", "result": ""}
+        res_data = {"code": RESP_CODE_ERROR, "error": "", "result": ""}
         cookie = request.POST.get("cookie")
         if not cookie:
             res_data.update({"error": "缺少参数"})
@@ -62,11 +63,11 @@ class BdAccount(View):
         if not is_ok:
             res_data.update({"error": data})
             return JsonResponse(res_data)
-        res_data.update({"code": 1, "result": data})
+        res_data.update({"code": RESP_CODE_SUCCESS, "result": data})
         return JsonResponse(res_data)
 
     def delete(self, request):
-        res_data = {"code": 0, "error": "", "result": ""}
+        res_data = {"code": RESP_CODE_ERROR, "error": "", "result": ""}
         try:
             ids = json.loads(request.body.decode()).get("ids")
         except Exception as e:
@@ -79,6 +80,6 @@ class BdAccount(View):
         if not is_ok:
             res_data.update({"error": data})
             return JsonResponse(res_data)
-        res_data.update({"code": 1})
+        res_data.update({"code": RESP_CODE_SUCCESS})
         res_data.update({"result": "成功删除{}条记录".format(data)})
         return JsonResponse(res_data)

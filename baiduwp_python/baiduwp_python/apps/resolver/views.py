@@ -8,6 +8,7 @@ from django.shortcuts import render
 from django.views import View
 
 from baiduwp_python.apps.account.utils.cookie_orm import get_cookie_from_db
+from baiduwp_python.settings.config import RESP_CODE_ERROR, RESP_CODE_SUCCESS
 from baiduwp_python.settings.settings import logger
 from baiduwp_python.utils.header_utils import get_bd_headers
 
@@ -19,7 +20,7 @@ class Resolver(View):
 
 class MSetInfo(View):
     def post(self, request):
-        res_data = {"code": 0, "error": ""}
+        res_data = {"code": RESP_CODE_ERROR, "error": ""}
         share_url = request.POST.get("share_url")
         pwd = request.POST.get("pwd")
         share_url = str(share_url).strip() if share_url else ""
@@ -67,13 +68,13 @@ class MSetInfo(View):
         if not files_info.get("file_list"):
             res_data.update({"error": "获取文件列表失败（locals.mset）"})
             return JsonResponse(res_data)
-        res_data.update({"code": 1, "result": files_info})
+        res_data.update({"code": RESP_CODE_SUCCESS, "result": files_info})
         return JsonResponse(res_data)
 
 
 class FileList(View):
     def post(self, request):
-        res_data = {"code": 0, "error": ""}
+        res_data = {"code": RESP_CODE_ERROR, "error": ""}
         share_uk = request.POST.get("share_uk")
         shareid = request.POST.get("shareid")
         # bdstoken = request.POST.get("bdstoken")
@@ -109,13 +110,13 @@ class FileList(View):
         if res_json.get("errno") != 0:
             res_data.update({"error": f"请求文件信息失败({res_json.get('errmsg')})"})
             return JsonResponse(res_data)
-        res_data.update({"code": 1, "result": res_json.get("list")})
+        res_data.update({"code": RESP_CODE_SUCCESS, "result": res_json.get("list")})
         return JsonResponse(res_data)
 
 
 class WxFileList(View):
     def post(self, request):
-        res_data = {"code": 0, "error": ""}
+        res_data = {"code": RESP_CODE_ERROR, "error": ""}
         share_url = request.POST.get("share_url")
         pwd = request.POST.get("pwd")
         file_path = request.POST.get("file_path")
@@ -141,13 +142,13 @@ class WxFileList(View):
         if not is_ok:
             res_data.update({"error": file_data})
             return JsonResponse(res_data)
-        res_data.update({"code": 1, "result": file_data})
+        res_data.update({"code": RESP_CODE_SUCCESS, "result": file_data})
         return JsonResponse(res_data)
 
 
 class DownloadLink(View):
     def post(self, request):
-        res_data = {"code": 0, "error": ""}
+        res_data = {"code": RESP_CODE_ERROR, "error": ""}
         share_url = request.POST.get("share_url")
         fs_id = request.POST.get("fs_id")
         share_uk = request.POST.get("share_uk")
@@ -192,7 +193,7 @@ class DownloadLink(View):
             "filename": d_link_dict.get("server_filename"),
             "size": d_link_dict.get("size"),
         }
-        res_data.update({"code": 1, "result": download_info})
+        res_data.update({"code": RESP_CODE_SUCCESS, "result": download_info})
         return JsonResponse(res_data)
 
 

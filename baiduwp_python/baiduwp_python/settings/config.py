@@ -31,3 +31,9 @@ SELENIUM_EXECUTABLE_PATH = r"E:\webdriver\chromedriver.exe"
 """限制解析次数"""
 PARSE_COUNT_LIMIT = 10  # 限制每个IP的解析次数
 PARSE_COUNT_EX_TIME = 86400  # 解除限制时间（秒）
+
+"""响应码"""
+RESP_CODE_ERROR = 0
+RESP_CODE_SUCCESS = 1
+RESP_CODE_INVITATION = 2
+RESP_CODE_PARSE_LIMIT = 3
