@@ -2,9 +2,11 @@ from django.http import JsonResponse
 from django.utils.deprecation import MiddlewareMixin
 from django_redis import get_redis_connection
 
+from baiduwp_python.apps.resolver.urls import URL_PATH_WX_FILE_LIST, URL_PATH_DOWNLOAD_LINK
 from baiduwp_python.middlewares.utils.request_path_utils import normalize_path
 from baiduwp_python.settings.config import THROTTLE_PATH_LIST, PARSE_COUNT_LIMIT, PARSE_COUNT_EX_TIME, \
     RESP_CODE_INVITATION, RESP_CODE_PARSE_LIMIT
+from baiduwp_python.settings.settings import DEBUG
 from baiduwp_python.utils.remote_ip_utils import get_client_ip
 
 
@@ -45,8 +47,10 @@ class StatisticsMiddleware(MiddlewareMixin):
             count_key = "bdwp:msetCount"
         elif path == "/fileList/":
             count_key = "bdwp:fileListCount"
-        elif path == "/downloadLink/":
-            count_key = "bdwp:downloadLinkCount"
+        elif path == f"/{URL_PATH_WX_FILE_LIST}/":
+            count_key = f"bdwp:{URL_PATH_WX_FILE_LIST}"
+        elif path == f"/{URL_PATH_DOWNLOAD_LINK}/":
+            count_key = f"bdwp:{URL_PATH_DOWNLOAD_LINK}"
         if count_key:
             redis_conn.incrby(count_key, 1)
 
@@ -58,12 +62,14 @@ class ParseCountLimitMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         path = normalize_path(request)
-        if path != "/downloadLink/":
+        if path != f"/{URL_PATH_DOWNLOAD_LINK}/":
             return None
         client_ip = get_client_ip(request)
         # print(f"ParseCountLimitMiddleware client_ip: {client_ip}")
         if not client_ip:
             return JsonResponse({"code": RESP_CODE_PARSE_LIMIT, "error": "获取远程IP失败"})
+        if not DEBUG and client_ip == "127.0.0.1":
+            return JsonResponse({"code": RESP_CODE_PARSE_LIMIT, "error": "获取真实IP失败"})
         redis_conn = get_redis_connection("parse_count_limit")
         used_count = redis_conn.get(client_ip)
         if not used_count:
