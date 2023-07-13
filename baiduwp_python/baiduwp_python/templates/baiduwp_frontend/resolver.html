@@ -261,6 +261,8 @@
     let share_uk = ""
     let shareid = ""
     let seckey = ""
+    let sign = ""
+    let sign_timestamp = ""
     let bdstoken = ""
     let mSetUrl = "/mSetInfo/"
     let fileListUrl = "/fileList/"
@@ -314,6 +316,16 @@
             toastr["warning"]("请输入邀请码", "提示")
             return
         }
+
+        upperLevelPath = ""
+        share_uk = ""
+        shareid = ""
+        seckey = ""
+        sign = ""
+        sign_timestamp = ""
+        bdstoken = ""
+        files.splice(0)
+
         // getMSet()
         getWxList()
     })
@@ -590,6 +602,8 @@
                 "share_uk": share_uk,
                 "shareid": shareid,
                 "seckey": seckey,
+                "sign": sign,
+                "sign_timestamp": sign_timestamp,
             },
             beforeSend: showModal(),
             success: function (res) {
@@ -604,6 +618,8 @@
                 rDiv.append($('<div class="realLinkDiv"><span>链接</span><input type="text" realonly value="' + res.result["real_link"] + '"><button class="copyButton">复制</button></div>'))
                 rDiv.append($('<div class="realLinkDiv"><span>代理</span><input type="text" realonly value="' + res.result["user_agent"] + '"><button class="copyButton">复制</button></div>'))
                 this_.attr("isSuccess", 1)
+                sign = res.result["sign"]
+                sign_timestamp = res.result["sign_timestamp"]
                 monitorCopyClick()
             },
             error: function (e) {

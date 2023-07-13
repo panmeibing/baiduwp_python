@@ -126,6 +126,14 @@ CACHES = {
             "CONNECTION_POOL_KWARGS": {"max_connections": 1000, 'decode_responses': True},
         }
     },
+    "download_link": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/2",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "CONNECTION_POOL_KWARGS": {"max_connections": 1000, 'decode_responses': True},
+        }
+    },
 }
 
 log_path = os.path.join(BASE_DIR, 'logs')

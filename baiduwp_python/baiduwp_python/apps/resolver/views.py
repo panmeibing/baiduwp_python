@@ -1,14 +1,16 @@
 import json
 import re
+from time import time
 from urllib.parse import urlencode, unquote, quote, quote_plus, unquote_plus
 
 import requests
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views import View
+from django_redis import get_redis_connection
 
 from baiduwp_python.apps.account.utils.cookie_orm import get_cookie_from_db
-from baiduwp_python.settings.config import RESP_CODE_ERROR, RESP_CODE_SUCCESS, WX_LIST_ERROR_TYPE
+from baiduwp_python.settings.config import RESP_CODE_ERROR, RESP_CODE_SUCCESS, WX_LIST_ERROR_TYPE, DL_INFO_EX_TIME
 from baiduwp_python.settings.settings import logger
 from baiduwp_python.utils.header_utils import get_bd_headers
 
@@ -154,6 +156,8 @@ class DownloadLink(View):
         share_uk = request.POST.get("share_uk")
         shareid = request.POST.get("shareid")
         seckey = request.POST.get("seckey")
+        sign = request.POST.get("sign")
+        sign_timestamp = request.POST.get("sign_timestamp")
         if not all([share_url, fs_id, share_uk, shareid, seckey]):
             res_data.update({"error": "缺少参数"})
             return JsonResponse(res_data)
@@ -165,11 +169,25 @@ class DownloadLink(View):
         if not surl:
             res_data.update({"error": "缺少参数"})
             return JsonResponse(res_data)
+        redis_conn = get_redis_connection("download_link")
+        fs_info = redis_conn.get(f"download_link:{fs_id}")
+        if fs_info:
+            try:
+                res_data.update({"code": RESP_CODE_SUCCESS, "result": json.loads(fs_info)})
+                return JsonResponse(res_data)
+            except Exception as e:
+                logger.error(f"DownloadLink post() get fs info from redis failed,  fs_info: {fs_info}, error: {e}")
         is_ok, cookie = get_cookie_from_db(vip_type=2)
         if not is_ok:
             res_data.update({"error": cookie})
             return JsonResponse(res_data)
-        is_ok, sign_time = get_sign(surl, cookie.get("cookie"))
+        if not sign or not sign_timestamp or not str(sign_timestamp).isdigit():
+            is_ok, sign_time = get_sign(cookie.get("cookie"), surl)
+        elif time() - int(sign_timestamp) > 290:
+            is_ok, sign_time = get_sign(cookie.get("cookie"), None, shareid, share_uk)
+        else:
+            is_ok = True
+            sign_time = (sign, int(sign_timestamp))
         if not is_ok:
             res_data.update({"error": sign_time})
             return JsonResponse(res_data)
@@ -192,15 +210,25 @@ class DownloadLink(View):
             "category": d_link_dict.get("category"),
             "filename": d_link_dict.get("server_filename"),
             "size": d_link_dict.get("size"),
+            "sign": sign_time[0],
+            "sign_timestamp": sign_time[1],
         }
+        redis_conn.setex(f"download_link:{fs_id}", DL_INFO_EX_TIME, json.dumps(download_info))
         res_data.update({"code": RESP_CODE_SUCCESS, "result": download_info})
         return JsonResponse(res_data)
 
 
-def get_sign(surl, cookie):
-    url = f"https://pan.baidu.com/share/tplconfig?surl={surl}&fields=sign,timestamp&channel=chunlei&web=1&app_id=250528&clienttype=0"
+def get_sign(cookie, surl=None, share_id=None, uk=None):
+    params = ""
+    if surl:
+        params += f"surl={surl}&"
+    if share_id:
+        params += f"shareid={share_id}&"
+    if uk:
+        params += f"uk={uk}&"
+    url = f"https://pan.baidu.com/share/tplconfig?{params}fields=sign,timestamp&channel=chunlei&web=1&app_id=250528&clienttype=0"
     headers = {
-        "User-Agent": "netdisk",
+        "User-Agent": "netdisk;pan.baidu.com",
         "Cookie": cookie,
     }
     try:
