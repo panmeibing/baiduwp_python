@@ -4,7 +4,7 @@ from django_redis import get_redis_connection
 
 from baiduwp_python.apps.resolver.urls import URL_PATH_WX_FILE_LIST, URL_PATH_DOWNLOAD_LINK
 from baiduwp_python.middlewares.utils.request_path_utils import normalize_path
-from baiduwp_python.settings.config import THROTTLE_PATH_LIST, PARSE_COUNT_LIMIT, PARSE_COUNT_EX_TIME, \
+from baiduwp_python.settings.config import THROTTLE_PATH_SET, PARSE_COUNT_LIMIT, PARSE_COUNT_EX_TIME, \
     RESP_CODE_INVITATION, RESP_CODE_PARSE_LIMIT
 from baiduwp_python.settings.settings import DEBUG
 from baiduwp_python.utils.remote_ip_utils import get_client_ip
@@ -17,7 +17,7 @@ class InvitationMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         path = normalize_path(request)
-        if path not in THROTTLE_PATH_LIST:
+        if path not in THROTTLE_PATH_SET:
             return None
         redis_conn = get_redis_connection("default")
         inv_code_redis = redis_conn.get("bdwp:invitation_code")

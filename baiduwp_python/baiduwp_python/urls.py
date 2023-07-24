@@ -15,11 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.views.generic import TemplateView
 
 from baiduwp_python.settings.config import URL_PATH_ADMIN
 
 urlpatterns = [
     path(URL_PATH_ADMIN, admin.site.urls),
+    path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain')),
     path('', include(("user.urls", "user"), namespace="user")),
     path('', include(("resolver.urls", "resolver"), namespace="resolver")),
     path('', include(("account.urls", "account"), namespace="account")),

@@ -6,23 +6,23 @@ IS_NEED_INVITATION_CODE = True  # 是否需要邀请码
 INVITATION_CODE_FIXED = None  # 邀请码，若为None则随机生成
 INVITATION_CODE_EXP_TIME = 86400  # 邀请码超时时间（秒）
 # 需要验证邀请码的路径
-THROTTLE_PATH_LIST = [
+THROTTLE_PATH_SET = {
     "/mSetInfo/", "/fileList/", "/downloadLink/",
-]
+}
 
 """后台登录路由"""
 URL_PATH_ADMIN = "admin/"
 
 """登录控制"""
 # 登录验证白名单
-LOGIN_PATH_WHITE_LIST = [
-    "/login/", "/resolver/", "/admin/",
+LOGIN_PATH_WHITE_SET = {
+    "/login/", "/resolver/", "/admin/", "/robots.txt/",
     "/mSetInfo/", "/fileList/", "/downloadLink/", "/wxFileList/"
-]
+}
 # 登录验证黑名单
-LOGIN_PATH_BLACK_LIST = []
+LOGIN_PATH_BLACK_SET = {}
 # 登录验证IP地址黑名单
-LOGIN_IP_BLACK_LIST = []
+LOGIN_IP_BLACK_SET = {}
 
 """chrome驱动"""
 # chrome驱动路径
