@@ -715,9 +715,39 @@
             if (tempList[i].parent_path == parent_path) {
                 let img = $('<img alt="" class="fileIco">')
                 if (tempList[i].isdir == 1) {
-                    img.attr("src", '../../static/images/ico/folder.png')
+                    img.attr("src", '../../static/images/ico/wp_ico/folder.png')
                 } else {
-                    img.attr("src", "../../static/images/ico/exe.png")
+                    let fileType = ""
+                    try {
+                        fileType = String(tempList[i].path).substring(String(tempList[i].path).lastIndexOf(".") + 1)
+                    } catch (e) { }
+
+                    if (["zip", "rar"].indexOf(fileType) >= 0) {
+                        img.attr("src", "../../static/images/ico/wp_ico/zip.png")
+                    } else if (["exe", "dmg", "msi"].indexOf(fileType) >= 0) {
+                        img.attr("src", "../../static/images/ico/wp_ico/exe.png")
+                    } else if (fileType == "apk") {
+                        img.attr("src", "../../static/images/ico/wp_ico/android.png")
+                    } else if (["mp4", "mov", "avi", "rmvb", "mkv", "wmv", "flv", "f4v", "rm"].indexOf(fileType) >= 0) {
+                        img.attr("src", "../../static/images/ico/wp_ico/video.png")
+                    } else if (["mp3", "flac", "aac", "wav", "wma", "ape", "ogg"].indexOf(fileType) >= 0) {
+                        img.attr("src", "../../static/images/ico/wp_ico/music.png")
+                    } else if (["png", "jpg", "jpeg", "gif", "bmp", "tiff", "webp", "raw"].indexOf(fileType) >= 0) {
+                        img.attr("src", "../../static/images/ico/wp_ico/picture.png")
+                    } else if (fileType == "pdf") {
+                        img.attr("src", "../../static/images/ico/wp_ico/pdf.png")
+                    } else if (["docx", "doc"].indexOf(fileType) >= 0) {
+                        img.attr("src", "../../static/images/ico/wp_ico/word.png")
+                    } else if (["xlsx", "xls"].indexOf(fileType) >= 0) {
+                        img.attr("src", "../../static/images/ico/wp_ico/excel.png")
+                    } else if (["pptx", "ppt"].indexOf(fileType) >= 0) {
+                        img.attr("src", "../../static/images/ico/wp_ico/ppt.png")
+                    } else if (fileType == "txt") {
+                        img.attr("src", "../../static/images/ico/wp_ico/text.png")
+                    } else {
+                        img.attr("src", "../../static/images/ico/wp_ico/misc.png")
+                    }
+
                 }
                 let span = $('<span><a href="javascript:void(0);" path="' + tempList[i].path + '" parent_path="' + tempList[i].parent_path + '" is_dir=' + tempList[i].isdir + ' fs_id=' + tempList[i].fs_id + ' >' + tempList[i].server_filename + '</a></span>')
                 let fileRowDiv = $('<div class="fileRow"></div>')
