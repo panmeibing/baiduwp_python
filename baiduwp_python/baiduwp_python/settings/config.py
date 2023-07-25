@@ -7,7 +7,7 @@ INVITATION_CODE_FIXED = None  # 邀请码，若为None则随机生成
 INVITATION_CODE_EXP_TIME = 86400  # 邀请码超时时间（秒）
 # 需要验证邀请码的路径
 THROTTLE_PATH_SET = {
-    "/mSetInfo/", "/fileList/", "/downloadLink/",
+    "/mSetInfo/", "/fileList/", "/downloadLink/", "/wxFileList/", "/downloadLink/"
 }
 
 """后台登录路由"""
