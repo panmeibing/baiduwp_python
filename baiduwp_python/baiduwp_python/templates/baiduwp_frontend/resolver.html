@@ -207,7 +207,7 @@
         <div id="explorerContainer">
             <table>
                 <tbody>
-                    <tr>
+                    <!-- <tr>
                         <td>
                             <div class="fileRow">
                                 <span><a href="" id="upperLevel">上一级...</a></span>
@@ -217,7 +217,7 @@
                     <tr>
                         <td>
                             <div class="fileRow">
-                                <img src="../../static/images/ico/folder.png" alt="" class="fileIco">
+                                <img src="../../static/images/ico/wp_ico/folder.png" alt="" class="fileIco">
                                 <span><a href="">新建文件夹</a></span>
                                 <div>
                                     <div class="realLinkDiv">
@@ -237,7 +237,7 @@
                     <tr>
                         <td>
                             <div class="fileRow">
-                                <img src="../../static/images/ico/folder.png" alt="" class="fileIco">
+                                <img src="../../static/images/ico/wp_ico/folder.png" alt="" class="fileIco">
                                 <span><a href="javascript:void(0);">新建文件夹</a></span>
                             </div>
                         </td>
@@ -245,11 +245,11 @@
                     <tr>
                         <td>
                             <div class="fileRow">
-                                <img src="../../static/images/ico/folder.png" alt="" class="fileIco">
+                                <img src="../../static/images/ico/wp_ico/folder.png" alt="" class="fileIco">
                                 <span><a href="">新建文件夹</a></span>
                             </div>
                         </td>
-                    </tr>
+                    </tr> -->
                 </tbody>
             </table>
         </div>
@@ -747,7 +747,6 @@
                     } else {
                         img.attr("src", "../../static/images/ico/wp_ico/misc.png")
                     }
-
                 }
                 let span = $('<span><a href="javascript:void(0);" path="' + tempList[i].path + '" parent_path="' + tempList[i].parent_path + '" is_dir=' + tempList[i].isdir + ' fs_id=' + tempList[i].fs_id + ' >' + tempList[i].server_filename + '</a></span>')
                 let fileRowDiv = $('<div class="fileRow"></div>')

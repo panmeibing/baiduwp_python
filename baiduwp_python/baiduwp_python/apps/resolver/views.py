@@ -212,6 +212,7 @@ class DownloadLink(View):
             "size": d_link_dict.get("size"),
             "sign": sign_time[0],
             "sign_timestamp": sign_time[1],
+            "resolve_time": int(time()),
         }
         redis_conn.setex(f"download_link:{fs_id}", DL_INFO_EX_TIME, json.dumps(download_info))
         res_data.update({"code": RESP_CODE_SUCCESS, "result": download_info})
