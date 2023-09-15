@@ -136,6 +136,17 @@ CACHES = {
     },
 }
 
+THROTTLE_BACKEND = 'throttle.backends.cache.CacheBackend'
+THROTTLE_ZONES = {
+    'default': {
+        'VARY': 'throttle.zones.RemoteIP',
+        'ALGORITHM': 'fixed-bucket',
+        'BUCKET_INTERVAL': 20,
+        'BUCKET_CAPACITY': 10,
+    },
+}
+THROTTLE_ENABLED = True
+
 log_path = os.path.join(BASE_DIR, 'logs')
 if not os.path.exists(log_path):
     os.mkdir(log_path)

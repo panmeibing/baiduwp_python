@@ -6,8 +6,10 @@ from urllib.parse import urlencode, unquote, quote, quote_plus, unquote_plus
 import requests
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
 from django.views import View
 from django_redis import get_redis_connection
+from throttle.decorators import throttle
 
 from baiduwp_python.apps.account.utils.cookie_orm import get_cookie_from_db
 from baiduwp_python.settings.config import RESP_CODE_ERROR, RESP_CODE_SUCCESS, WX_LIST_ERROR_TYPE, DL_INFO_EX_TIME
@@ -16,11 +18,16 @@ from baiduwp_python.utils.header_utils import get_bd_headers
 
 
 class Resolver(View):
+    @method_decorator(throttle(zone='default'))
     def get(self, request):
         return render(request, 'baiduwp_frontend/resolver.html')
 
 
 class MSetInfo(View):
+    @method_decorator(throttle(zone='default'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(MSetInfo, self).dispatch(request, *args, **kwargs)
+
     def post(self, request):
         res_data = {"code": RESP_CODE_ERROR, "error": ""}
         share_url = request.POST.get("share_url")
@@ -75,6 +82,10 @@ class MSetInfo(View):
 
 
 class FileList(View):
+    @method_decorator(throttle(zone='default'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(FileList, self).dispatch(request, *args, **kwargs)
+
     def post(self, request):
         res_data = {"code": RESP_CODE_ERROR, "error": ""}
         share_uk = request.POST.get("share_uk")
@@ -117,6 +128,10 @@ class FileList(View):
 
 
 class WxFileList(View):
+    @method_decorator(throttle(zone='default'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(WxFileList, self).dispatch(request, *args, **kwargs)
+
     def post(self, request):
         res_data = {"code": RESP_CODE_ERROR, "error": ""}
         share_url = request.POST.get("share_url")
@@ -149,6 +164,11 @@ class WxFileList(View):
 
 
 class DownloadLink(View):
+    @method_decorator(throttle(zone='default'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(DownloadLink, self).dispatch(request, *args, **kwargs)
+
+    @method_decorator(throttle(zone='default'))
     def post(self, request):
         res_data = {"code": RESP_CODE_ERROR, "error": ""}
         share_url = request.POST.get("share_url")

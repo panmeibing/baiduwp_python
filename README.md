@@ -37,6 +37,7 @@ pip install apscheduler
 pip install selenium
 pip install requests
 pip install mysqlclient
+pip install django-throttle-requests
 ```
 
 ##### 3.2 下载项目
