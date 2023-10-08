@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>百度网盘解析</title>
+    <title>某度网盘解析</title>
 </head>
 <style>
     html,
@@ -186,7 +186,7 @@
 
     <div class="formContainer">
         <div id="containerTitle">
-            <span>百度网盘在线解析</span>
+            <span>某度网盘在线解析</span>
         </div>
         <div style="background-color: #a75318; height: 5px; width: 100%;"></div>
         <form action="">
@@ -293,7 +293,7 @@
         pwd = share_url.split("?").length > 1 ? share_url.split("?")[1] : ""
         pwd = pwd.split("=")[1]
         if (!pwd) {
-            let mRes = input_share_url.match(/提取码: ?([0-9a-zA-Z]+)/)
+            let mRes = input_share_url.match(/提取码:?\s*([0-9a-zA-Z]{4})\s?/)
             if (mRes) {
                 pwd = mRes[1]
             }
